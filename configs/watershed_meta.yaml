@@ -1,0 +1,31 @@
+# 昕水河流域与水文站元数据
+watershed:
+  name: "昕水河 (Xinshui River)"
+  basin_polygon_area_km2: 4319.05      # 由 projected/xinshui_basin_boundary_utm.geojson 实算
+  crs: "EPSG:32649"
+
+gauge:
+  name: "大宁水文站 (Daning)"
+  # 用户尚未提供站点坐标与控制面积 -> 暂用文献常见值（报告中注明）
+  drainage_area_km2: 3992.0
+  drainage_area_source: "literature_default"   # 用户提供后改为 "user"
+  lat: null
+  lon: null
+
+paths:
+  swat_dir: "Xinshui_SWAT_Inputs"
+  dem: "Xinshui_SWAT_Inputs/projected/Xinshui_DEM_30m_utm.tif"
+  lulc: "Xinshui_SWAT_Inputs/projected/Xinshui_LULC_WorldCover_30m_utm.tif"
+  soil: "Xinshui_SWAT_Inputs/projected/Xinshui_Soil_Texture_USDA_30m_utm.tif"
+  lulc_lookup: "Xinshui_SWAT_Inputs/projected/lookup_landuse_worldcover.csv"
+  soil_lookup: "Xinshui_SWAT_Inputs/projected/lookup_soil_texture_usda.csv"
+  basin: "Xinshui_SWAT_Inputs/projected/xinshui_basin_boundary_utm.geojson"
+  rivers: "Xinshui_SWAT_Inputs/projected/xinshui_river_network_utm.geojson"
+  weather: "Xinshui_SWAT_Inputs/Xinshui_SWAT_Weather_Daily_2015_2023.csv"
+  stations: "Xinshui_SWAT_Inputs/Xinshui_SWAT_Weather_Stations_Info.csv"
+  # P0 观测径流（任选其一）
+  observed_daily: "data/external/xinshui_observed_runoff.csv"
+  observed_monthly: "data/external/xinshui_observed_runoff_monthly.csv"
+  swat_simulated: "data/external/swat_simulated_runoff.csv"
+  # 合成孪生径流（仅在无观测数据时用于冒烟测试）
+  synthetic_daily: "data/synthetic/SYNTHETIC_twin_runoff.csv"

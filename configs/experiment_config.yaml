@@ -1,0 +1,75 @@
+# 实验配置
+seed: 42
+final_seeds: [42, 102, 202, 302, 402]
+
+# 观测径流不存在时，是否允许用合成孪生径流跑通管线（结果一律标注 SYNTHETIC，不作正式性能结论）
+allow_synthetic: true
+
+# 运行档位：smoke = 缩减预算快速跑通；full = 正式预算（有真实观测时使用）
+profile: smoke
+
+split:
+  warmup: ["2015-01-01", "2015-12-31"]
+  calib: ["2016-01-01", "2019-12-31"]
+  valid: ["2020-01-01", "2020-12-31"]
+  test: ["2021-01-01", "2023-12-31"]
+  small_sample_calib: ["2018-01-01", "2019-12-31"]
+  extreme_year: ["2021-01-01", "2021-12-31"]
+
+physics:
+  # 参数名: [下界, 上界]
+  bounds:
+    Tth: [-2.0, 2.0]        # 雨雪分界温度 (°C)
+    Tm: [-1.0, 3.0]         # 融雪起始温度 (°C)
+    Df: [0.5, 6.0]          # 度日因子 (mm/°C/d)
+    cn_scale: [0.75, 1.25]  # CN0 缩放
+    lam_ia: [0.05, 0.30]    # 初损系数
+    Smax: [50.0, 500.0]     # 土壤蓄水上限 (mm)
+    Qmax: [0.01, 3.0]       # 最大基流 (mm/d)
+    f: [0.005, 0.10]        # 基流衰减系数 (1/mm)
+    alpha_et: [0.40, 1.30]  # 蒸散发系数
+    kf: [0.10, 0.90]        # 快水库出流系数 (1/d)
+    ks: [0.001, 0.10]       # 慢水库出流系数 (1/d)
+  tau_T: 1.0
+
+stage1:   # 外环 I：物理参数率定
+  optimizers: ["PSO", "GWO", "SSA"]
+  smoke: {pop: 20, iters: 40, repeats: 2}
+  full: {pop: 30, iters: 80, repeats: 3}
+
+hybrid:
+  modulation_et: 0.30
+  modulation_cn: 0.25
+  default:            # Base-PINN（无外环 II 寻优）
+    lambda_wb: 1.0
+    lambda_ode: 0.5
+    lambda_mono: 0.2
+    lambda_res: 0.1
+    hidden_dim: 32
+    lr: 0.005
+    dropout: 0.1
+    gamma0: 0.3
+  smoke: {epochs: 60, patience: 15, tune_epochs: 25}
+  full: {epochs: 180, patience: 30, tune_epochs: 60}
+
+stage2:   # 外环 II：PINN 损失权重与超参
+  search_space:
+    log10_lambda_wb: [-2.0, 1.0]
+    log10_lambda_ode: [-2.0, 1.0]
+    log10_lambda_mono: [-2.0, 1.0]
+    log10_lambda_res: [-3.0, 0.0]
+    hidden_dim: [16, 64]        # 取整到 {16,24,32,48,64}
+    log10_lr: [-3.0, -1.8]
+    dropout: [0.0, 0.3]
+    gamma0: [0.05, 0.5]
+  smoke: {pop: 6, iters: 4, nsga_pop: 8, nsga_gens: 4}
+  full: {pop: 12, iters: 15, nsga_pop: 16, nsga_gens: 15}
+
+lstm:
+  seq_len: 270
+  hidden_dim: 64
+  lr: 0.002
+  dropout: 0.2
+  batch_size: 64
+  smoke: {epochs: 25, patience: 8}
+  full: {epochs: 80, patience: 15}

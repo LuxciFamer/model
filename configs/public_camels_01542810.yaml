@@ -1,0 +1,90 @@
+# 公开小流域基准配置：CAMELS-US / USGS 01542810 (Waldy Run near Emporium, PA)
+watershed:
+  site_id: "01542810"
+  name: "Waldy Run near Emporium, PA (CAMELS-US)"
+  lat: 41.5789
+  lon: -78.2925
+  area_km2: 13.5715
+  area_sqmi: 5.24
+  CN0: 62.0
+
+split:
+  warmup: ["2010-01-01", "2010-12-31"]
+  calib: ["2011-01-01", "2018-12-31"]
+  valid: ["2019-01-01", "2020-12-31"]
+  test: ["2021-01-01", "2024-12-31"]
+  small_sample_calib: ["2017-01-01", "2018-12-31"]
+
+physics:
+  bounds:
+    Tth: [-2.0, 2.5]        # 雨雪分界温度 (°C)
+    Tm: [-1.5, 3.0]         # 融雪起始温度 (°C)
+    Df: [0.5, 7.0]          # 度日因子 (mm/°C/d)
+    cn_scale: [0.60, 1.40]  # CN0 缩放
+    lam_ia: [0.02, 0.30]    # 初损系数
+    Smax: [50.0, 500.0]     # 土壤蓄水上限 (mm)
+    Qmax: [0.1, 15.0]       # 最大基流 (mm/d) - 湿润流域适配上界
+    f: [0.005, 0.10]        # 基流衰减系数 (1/mm)
+    alpha_et: [0.40, 1.30]  # 蒸散发系数
+    kf: [0.15, 0.95]        # 快水库出流系数 (1/d)
+    ks: [0.005, 0.25]       # 慢水库出流系数 (1/d)
+  tau_T: 1.0
+
+stage1:
+  optimizers: ["PSO", "GWO", "SSA"]
+  pop: 30
+  iters: 80
+  repeats: 3
+
+lstm:
+  seq_len: 180
+  hidden_dim: 64
+  dropout: 0.2
+  lr: 0.002
+  batch_size: 64
+  epochs: 60
+  patience: 12
+
+hybrid:
+  modulation_et: 0.35
+  modulation_cn: 0.30
+  default:
+    lambda_wb: 1.0
+    lambda_ode: 0.5
+    lambda_mono: 0.2
+    lambda_res: 0.1
+    hidden_dim: 32
+    lr: 0.005
+    dropout: 0.1
+    gamma0: 0.35
+  tune_epochs: 18
+  tune_patience: 6
+  val_every: 2
+  workers: 10
+  final_epochs: 90
+  final_patience: 20
+  final_seeds: [42, 102, 202, 302, 402]
+
+stage2:
+  j_coef: 0.05
+  proxy_warmup: ["2014-01-01", "2014-12-31"]
+  proxy_calib: ["2015-01-01", "2018-12-31"]
+  proxy_valid: ["2019-01-01", "2020-12-31"]
+  search_space:
+    log10_lambda_wb: [-2.0, 1.0]
+    log10_lambda_ode: [-2.0, 0.5]
+    log10_lambda_mono: [-2.0, 0.5]
+    log10_lambda_res: [-3.0, 0.0]
+    hidden_dim: [16, 64]
+    log10_lr: [-3.0, -1.8]
+    dropout: [0.0, 0.3]
+    gamma0: [0.10, 0.70]
+  pop: 6
+  iters: 5
+  seeds:
+    PSO: 11
+    GWO: 22
+    SSA: 33
+  nsga_pop: 8
+  nsga_gens: 4
+  nsga_seed: 44

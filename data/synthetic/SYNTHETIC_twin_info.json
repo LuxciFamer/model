@@ -1,0 +1,24 @@
+{
+  "true_params": {
+    "Tth": 0.5,
+    "Tm": 1.0,
+    "Df": 2.5,
+    "cn_scale": 1.0,
+    "lam_ia": 0.15,
+    "Smax": 180.0,
+    "Qmax": 0.4,
+    "f": 0.03,
+    "alpha_et": 1.2999999999995908,
+    "kf": 0.45,
+    "ks": 0.02
+  },
+  "runoff_coefficient_2016_2023": 0.10765595030046834,
+  "noise_sigma": 0.1,
+  "seed": 2024,
+  "target_rc": 0.075,
+  "truth_processes": [
+    "seasonal alpha_et (+-25%)",
+    "storm-intensity CN (+-15%) via P_max_sta"
+  ],
+  "mean_runoff_mm_per_yr": 73.20529252014316
+}
